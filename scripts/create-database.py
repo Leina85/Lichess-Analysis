@@ -13,7 +13,7 @@ c.execute("DROP TABLE IF EXISTS lichess_data")
 # write table creation statement as multiline string to pass into execute method later to maintain readability
 table_creation = """
 CREATE TABLE lichess_data (
-    gameID TEXT PRIMARY KEY,
+    gameID INTEGER PRIMARY KEY AUTOINCREMENT,
     winner TEXT,
     eco TEXT,
     opening TEXT,
@@ -21,37 +21,36 @@ CREATE TABLE lichess_data (
     moves INTEGER
 )
 """
- # create table
+# create table
 c.execute(table_creation)
+
 
 with open("data/raw/decompressed_lichess_db_standard_rated_2015-05.pgn") as pgn:
     for i in range(5):
-        while game == True:
-            game = chess.pgn.read_game(pgn)
+        game = chess.pgn.read_game(pgn)
 
-            # gameID field
-            gameID = "game" + str(i)
+        # winner field
+        if game.headers["Result"] == "1-0": winner = "white"
+        elif game.headers["Result"] == "0-1": winner = "black"
+        elif game.headers["Result"] == "1/2-1/2": winner = "draw"
+        else: winner = "unknown"
 
-            # winner field
-            if game.Round() == "1-0": winner = "white"
-            elif game.Round() == "0-1": winner = "black"
-            elif game.Round() == "1/2-1/2": winner = "draw"
-            else:
-                game = False
-                break
+        # eco field
+        eco = game.headers["ECO"]
 
-            # eco field
-            eco = game.ECO()
+        # opening field
+        opening = game.headers["Opening"]
 
-            # opening field
-            opening = game.Opening()
+        # termination field
+        termination = game.headers["Termination"]
 
-            # termination field
-            termination = game.Termination()
+        # moves field
+        moves = len(list(game.mainline_moves()))
 
-            # moves field
-            moves = game.end().board().fullmove_number
+        c.execute("INSERT INTO lichess_data (winner, eco, opening, termination, moves) VALUES (?, ?, ?, ?, ?)", (winner, eco, opening, termination, moves))
+        print(i)
 
-            c.execute("INSERT INTO lichess_data VALUES (?, ?, ?, ?, ?, ?)", (gameID, winner, eco, opening, termination, moves))
-
+connect.commit()
 c.close()
+
+print("done")
