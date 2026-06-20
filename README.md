@@ -1,1 +1,3 @@
 # Lichess-Analysis
+
+html page image credit: "Chess" by romainguy is marked with CC0 1.0. To view the terms, visit https://creativecommons.org/publicdomain/zero/1.0/?ref=openverse.
