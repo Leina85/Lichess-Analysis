@@ -1,5 +1,3 @@
-alert("script loaded");
-
 document.getElementById("stats-form").addEventListener("submit", handle_submit);
 
 function handle_submit(event) {
