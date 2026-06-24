@@ -24,7 +24,6 @@ CREATE TABLE lichess_data (
 # create table
 c.execute(table_creation)
 
-
 with open("data/raw/decompressed_lichess_db_standard_rated_2015-05.pgn") as pgn:
     for i in range(10000):
         game = chess.pgn.read_game(pgn)
